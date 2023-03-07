@@ -54,12 +54,12 @@ import properties from '@/const/properties.js'
 export default {
   name: 'CoreWindow',
   data () {
-    return { store, properties }
+    return { store, properties, ruleName: '' }
   },
   computed: {
   },
   watch: {
-    "store.item": {
+    "store.item.window": {
       handler(newItem) {
         if (newItem === null) return
         this.store.item.style = convert(this.store.item.window)
@@ -86,9 +86,3 @@ export default {
   }
 }
 </script>
-
-<style>
-  .unselect {
-    user-select: none;
-  }
-</style>
