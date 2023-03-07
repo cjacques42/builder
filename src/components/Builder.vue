@@ -5,10 +5,8 @@
 </template>
 
 <script>
-import { v4 as uuidv4 } from 'uuid';
 import Rendering from '@/components/Rendering.vue'
 import { store } from '@/store.js'
-import convert from '@/utils/convert.js'
 
 export default {
   name: 'CoreBuilder',
@@ -23,7 +21,6 @@ export default {
       cursor: { clientX: 0, clientY: 0 },
       create: null,
       store,
-      hovered: []
     }
   },
   mounted () {
@@ -40,13 +37,8 @@ export default {
         return
       }
 
-      this.hovered.forEach(element => element.classList.remove('is-hovered'))
-
       const id = event.target.id || null
       if (id === null) return
-
-      this.hovered = [event.target]
-      this.hovered.forEach(element => element.classList.add('is-hovered'))
     },
     onMouseDown(event) {
       if (event.which !== 1) return;
@@ -77,13 +69,7 @@ export default {
         { property: 'width', value: width, active: true },
         { property: 'height', value: height, active: true },
       ]
-      store.add(id, {
-        id: uuidv4(),
-        tag: 'div',
-        children: [],
-        window,
-        style: convert(window)
-      })
+      store.add(id, { window })
       this.finished()
     },
     finished() {

@@ -41,7 +41,7 @@
       <button type="submit" class="border rounded py-1 px-2">+</button>
     </form>
     <div class="flex mt-4">
-      <button class="bg-gray-200 hover:bg-gray-300 text-gray-600 font-medium py-1 px-4 rounded shadow mx-auto" @click="store.item = null">Close</button>
+      <button class="bg-gray-200 hover:bg-gray-300 text-gray-600 font-medium py-1 px-4 rounded shadow mx-auto" @click="store.close">Close</button>
     </div>
   </div>
 </template>
@@ -60,8 +60,8 @@ export default {
   },
   watch: {
     "store.item.window": {
-      handler(newItem) {
-        if (newItem === null) return
+      handler() {
+        if (this.store.item === null) return
         this.store.item.style = convert(this.store.item.window)
       },
       deep: true,
