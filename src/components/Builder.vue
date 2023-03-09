@@ -24,9 +24,9 @@ export default {
     }
   },
   mounted () {
-    document.body.addEventListener("mousemove", event => this.onMouseMove(event));
-    document.body.addEventListener("mousedown", event => this.onMouseDown(event));
-    document.body.addEventListener("mouseup", event => this.onMouseUp(event));
+    document.body.addEventListener("mousemove", event => this.store.item === null && this.onMouseMove(event));
+    document.body.addEventListener("mousedown", event => this.store.item === null && this.onMouseDown(event));
+    document.body.addEventListener("mouseup", event => this.store.item === null && this.onMouseUp(event));
   },
   methods: {
     onMouseMove(event) {
