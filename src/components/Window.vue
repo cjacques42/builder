@@ -4,16 +4,15 @@
     ref="window"
     class="absolute shadow overflow-hidden rounded bg-white w-[400px] top-[25px] right-[25px]"
   >
-    <div ref="header" class="flex justify-end bg-indigo-200 px-2 py-1">
+    <div ref="header" class="flex bg-indigo-200 px-2 py-1">
+      <button class="hover:bg-gray-200 rounded-full p-0.5 mr-auto" @click="menu">
+        <Icon :d="mdiMenu" class="h-5 w-5 text-gray-600 hover:text-gray-700" />
+      </button>
       <button class="hover:bg-gray-200 rounded-full p-0.5" @click="minimize">
-        <svg viewBox="0 0 24 24" class="h-5 w-5 text-gray-600 hover:text-gray-700">
-          <path fill="currentColor" :d="mdiMinus" />
-        </svg>
+        <Icon :d="mdiMinus" class="h-5 w-5 text-gray-600 hover:text-gray-700" />
       </button>
       <button class="hover:bg-gray-200 rounded-full p-0.5" @click="store.close">
-        <svg viewBox="0 0 24 24" class="h-5 w-5 text-gray-600 hover:text-red-700">
-          <path fill="currentColor" :d="mdiWindowClose" />
-        </svg>
+        <Icon :d="mdiWindowClose" class="h-5 w-5 text-gray-600 hover:text-gray-700" />
       </button>
     </div>
     <div v-if="store.item && isMinimized" class="p-3">
@@ -29,9 +28,7 @@
           <label :for="style.property" class="text-gray-500 select-none">{{ style.property }}: </label>
           <input v-model="style.value" type="text" class="flex-grow mx-2 px-1 bg-gray-200 rounded" />
           <button class="ml-auto rounded-full" @click="remove(index)">
-            <svg viewBox="0 0 24 24" class="h-4 w-4 text-gray-600 hover:text-gray-800">
-              <path fill="currentColor" :d="mdiDelete" />
-            </svg>
+            <Icon :d="mdiDelete" class="h-4 w-4 text-gray-600 hover:text-gray-800" />
           </button>
         </div>
       </div>
@@ -52,10 +49,8 @@
   
       <form class="inline-flex mt-3" @submit.prevent="add(ruleName)">
         <input v-model="ruleName" type="text" placeholder="margin" class="appearance-none leading-tight focus:outline-none border-l border-y border-gray-400 rounded-l py-1 px-2" />
-        <button type="submit" class="rounded-r bg-blue-500 hover:bg-blue-700 text-white py-1.5 px-2">
-          <svg viewBox="0 0 24 24" class="h-5 w-5">
-            <path fill="currentColor" :d="mdiPlus" />
-          </svg>
+        <button type="submit" class="rounded-r bg-blue-500 hover:bg-blue-700 py-1.5 px-2">
+          <Icon :d="mdiPlus" class="h-5 w-5 text-white" />
         </button>
       </form>
     </div>
@@ -64,24 +59,30 @@
 
 <script>
 import { store } from '@/store.js'
+import Icon from '@/components/Icon.vue'
 import convert from '@/utils/convert.js'
 import drag from '@/utils/drag.js'
 import properties from '@/const/properties.js'
-import { mdiMinus, mdiWindowClose, mdiPlus, mdiDelete } from '@mdi/js';
+import { mdiMenu, mdiMinus, mdiWindowClose, mdiPlus, mdiDelete } from '@mdi/js';
 
 export default {
   name: 'CoreWindow',
   data () {
     return {
+      menuIsClosed: true,
       isMinimized: false,
       store,
       properties,
       ruleName: '',
+      mdiMenu,
       mdiMinus,
       mdiWindowClose,
       mdiPlus,
       mdiDelete,
     }
+  },
+  components: {
+    Icon
   },
   mounted () {
     drag(this.$refs.window, this.$refs.header)
@@ -98,6 +99,9 @@ export default {
     }
   },
   methods: {
+    menu() {
+      this.menuIsClosed = false
+    },
     minimize() {
       this.isMinimized = !this.isMinimized
     },
