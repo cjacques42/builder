@@ -1,21 +1,32 @@
 <template>
-  <div
+  <vue-resizable
     v-show="store.item"
     ref="window"
-    class="absolute shadow overflow-hidden rounded bg-white w-[400px] top-[25px] right-[25px]"
+    class="shadow rounded bg-white flex flex-col"
+    :width="400"
+    height="auto"
+    :min-width="400"
+    :active="active"
+    drag-selector=".header"
   >
-    <div ref="header" class="flex bg-indigo-200 px-2 py-1">
-      <button class="hover:bg-gray-200 rounded-full p-0.5 mr-auto" @click="menu">
-        <Icon :d="mdiMenu" class="h-5 w-5 text-gray-600 hover:text-gray-700" />
-      </button>
-      <button class="hover:bg-gray-200 rounded-full p-0.5" @click="minimize">
+    <div class="header flex bg-indigo-200 px-2 py-1 rounded-t">
+      <Dropdown :items="menu">
+        <template #default>
+          <MenuButton
+            class="inline-block hover:bg-gray-200 rounded-full p-0.5 focus:outline-none"
+          >
+            <Icon :d="mdiMenu" class="h-5 w-5 text-gray-600 hover:text-gray-700" />
+          </MenuButton>
+        </template>
+      </Dropdown>
+      <button class="inline-block hover:bg-gray-200 rounded-full p-0.5 ml-auto" @click="minimize">
         <Icon :d="mdiMinus" class="h-5 w-5 text-gray-600 hover:text-gray-700" />
       </button>
-      <button class="hover:bg-gray-200 rounded-full p-0.5" @click="store.close">
-        <Icon :d="mdiWindowClose" class="h-5 w-5 text-gray-600 hover:text-gray-700" />
+      <button class="inline-block hover:bg-gray-200 rounded-full p-0.5" @click="store.close">
+        <Icon :d="mdiWindowClose" class="h-5 w-5 text-gray-600 hover:text-red-700" />
       </button>
     </div>
-    <div v-if="store.item && isMinimized" class="p-3">
+    <div v-if="isOpened" class="p-3 overflow-y-auto">
       <div class="mb-3">
         <div class="font-bold text-sm text-grey-900 mb-1">Tag</div>
         <input v-model="store.item.tag" type="text" class="px-1 bg-gray-200 rounded" />
@@ -34,7 +45,7 @@
       </div>
   
       <!-- properties -->
-      <details class="mt-3">
+      <details class="mt-3 border rounded p-1">
         <summary>Click to see more</summary>
         <div class="space-y-1 max-h-[30vh] overflow-y-auto">
           <button
@@ -54,22 +65,28 @@
         </button>
       </form>
     </div>
-  </div>
+  </vue-resizable>
 </template>
 
 <script>
+import VueResizable from 'vue-resizable'
 import { store } from '@/store.js'
 import Icon from '@/components/Icon.vue'
+import Dropdown from '@/components/Dropdown.vue'
 import convert from '@/utils/convert.js'
-import drag from '@/utils/drag.js'
 import properties from '@/const/properties.js'
 import { mdiMenu, mdiMinus, mdiWindowClose, mdiPlus, mdiDelete } from '@mdi/js';
+import { MenuButton } from '@headlessui/vue'
 
 export default {
   name: 'CoreWindow',
   data () {
     return {
-      menuIsClosed: true,
+      menu: [
+        { name: 'Duplicate', click: () => store.duplicate(store.item.id, false) },
+        { name: 'Duplicate recusively', click: () => store.duplicate(store.item.id, true) },
+        { name: 'Remove', click: () => store.remove(store.item.id) },
+      ],
       isMinimized: false,
       store,
       properties,
@@ -82,38 +99,41 @@ export default {
     }
   },
   components: {
-    Icon
-  },
-  mounted () {
-    drag(this.$refs.window, this.$refs.header)
+    Icon,
+    Dropdown,
+    MenuButton,
+    VueResizable,
   },
   computed: {
+    active() {
+      return this.isOpened ? ['r', 'rb', 'b', 'lb', 'l', 'lt', 't', 'rt'] : ['r', 'l']
+    },
+    isOpened() {
+      return store.item && this.isMinimized === false
+    },
   },
   watch: {
     "store.item.window": {
       handler() {
-        if (this.store.item === null) return
-        this.store.item.style = convert(this.store.item.window)
+        if (store.item === null) return
+        store.item.style = convert(store.item.window)
       },
       deep: true,
     }
   },
   methods: {
-    menu() {
-      this.menuIsClosed = false
-    },
     minimize() {
       this.isMinimized = !this.isMinimized
     },
     add(property) {
-      this.store.item.window.push({ property, active: false })
+      store.item.window.push({ property, active: false })
       this.reset()
     },
     reset() {
       this.ruleName = ''
     },
     remove(indexToRemove) {
-      this.store.item.window = this.store.item.window.filter(
+      store.item.window = store.item.window.filter(
         (item, index) => !(index === indexToRemove)
       )
     },
