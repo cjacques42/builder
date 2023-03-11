@@ -45,9 +45,9 @@
       </div>
   
       <!-- properties -->
-      <details class="mt-3 border rounded p-1">
-        <summary>Click to see more</summary>
-        <div class="space-y-1 max-h-[30vh] overflow-y-auto">
+      <details class="mt-3 border rounded">
+        <summary class="px-2">Click to see more</summary>
+        <div class="space-y-1 max-h-[30vh] px-2 overflow-y-auto">
           <button
             v-for="(item, index) in properties" :key="index"
             class="px-2 bg-gray-100 rounded block w-full text-left"
