@@ -6,7 +6,9 @@ export const store = reactive({
   map: new Map(),
   item: null,
   duplicate(id, recursive = false) {
-    console.log(id, recursive)
+    const current = this.map.get(id)
+    const newNode = current.clone()
+    current.addAfter(newNode)
   },
   remove(id) {
     const current = this.map.get(id)

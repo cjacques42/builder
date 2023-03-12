@@ -75,6 +75,11 @@ export class Node {
         this.next = node
     }
 
+    clone() {
+        const { tag, parent, window } = this
+        return Node.create({ tag, parent, window: window.map(rule => Object.assign({}, rule)) })
+    }
+
     remove() {
         if (this.parent.size === 1) this.parent.first = this.parent.last = null
         if (this.previous) this.previous.next = this.next
