@@ -73,7 +73,6 @@ import VueResizable from 'vue-resizable'
 import { store } from '@/store.js'
 import Icon from '@/components/Icon.vue'
 import Dropdown from '@/components/Dropdown.vue'
-import convert from '@/utils/convert.js'
 import properties from '@/const/properties.js'
 import { mdiMenu, mdiMinus, mdiWindowClose, mdiPlus, mdiDelete } from '@mdi/js';
 import { MenuButton } from '@headlessui/vue'
@@ -111,15 +110,6 @@ export default {
     isOpened() {
       return store.item && this.isMinimized === false
     },
-  },
-  watch: {
-    "store.item.window": {
-      handler() {
-        if (store.item === null) return
-        store.item.style = convert(store.item.window)
-      },
-      deep: true,
-    }
   },
   methods: {
     minimize() {

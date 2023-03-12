@@ -1,53 +1,88 @@
 import { v4 as uuidv4 } from 'uuid';
 import convert from '@/utils/convert.js'
 
+export class Adapter {
+    constructor(parent = null, node = null) {
+        this.parent = parent
+        this.first = node
+        this.last = node
+    }
+
+    push(node) {
+        node.parent = this
+        if (this.size) {
+            this.last.addAfter(node)
+        } else {
+            this.first = this.last = node
+        }
+    }
+
+    get children() {
+        return this.first?.toArray || []
+    }
+
+    get size() {
+        return this.children.length
+    }
+
+    static create(parent, node) {
+        return new Adapter(parent, node)
+    }
+}
+
 export class Node {
-    constructor(tag = 'div', window = [], isFirst = false) {
-        this.id = uuidv4()
-        this.focus = false
+    constructor(opts) {
+        const configuration = Object.assign(this, {
+            id: uuidv4(),
+            tag: 'div',
+            focus: false,
+            parent: null,
+            window: [],
+            children: Adapter.create(this),
+        }, opts)
 
-        this.tag = tag
-        this.window = window
+        this.id = configuration.id
+        this.tag = configuration.tag
+        this.focus = configuration.focus
+        this.parent = configuration.parent
+        this.window = configuration.window
+        this.children = configuration.children
 
-        this.style = convert(window)
-
-        if (isFirst) this.first = this.last = this
-        else this.first = this.last = null
-
-        this.children = this.next = this.previous = null
+        this.next = this.previous = null
     }
 
     addBefore(node) {
-        if (this.last) node.last = this.last
-        if (this.last.first) this.last.first = node
-        this.last = null
         node.previous = this.previous
         node.next = this
-        if (this.previous) this.previous.next = node
+        if (this.previous) {
+            this.previous.next = node
+        } else {
+            // Adapter access
+            this.parent.first = node
+        }
         this.previous = node
     }
-
+    
     addAfter(node) {
-        if (this.first) node.first = this.first
-        if (this.first.last) this.first.last = node
-        this.first = null
         node.previous = this
         node.next = this.next
-        if (this.next) this.next.previous = node
+        if (this.next) {
+            this.next.previous = node
+        } else {
+            // Adapter access
+            this.parent.last = node
+        }
         this.next = node
     }
 
     remove() {
-        // Si je supprime le premier element de la chain, il y a un poiteur last vers le noeud
-        // if (this.last) this.next.last = this.last
-
-        // Si je supprime le dernier element de la chain, il y a un poiteur first vers le noeud
-        if (this.first) {
-            this.previous.first = this.first
-            this.first.last = this.previous
-        }
+        if (this.parent.size === 1) this.parent.first = this.parent.last = null
         if (this.previous) this.previous.next = this.next
         if (this.next) this.next.previous = this.previous
+    }
+
+    get style() {
+        return convert(this.window)
     }
 
     get toArray() {
@@ -57,7 +92,7 @@ export class Node {
         return [this]
     }
 
-    static create(tag, opts, isFirst) {
-        return new Node(tag, opts, isFirst)
+    static create(opts) {
+        return new Node(opts)
     }
 }

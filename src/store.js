@@ -1,8 +1,8 @@
 import { reactive } from 'vue'
-import { Node } from '@/lib/tree.js'
+import { Adapter, Node } from '@/lib/tree.js'
 
 export const store = reactive({
-  tree: null,
+  tree: Adapter.create(),
   map: new Map(),
   item: null,
   duplicate(id, recursive = false) {
@@ -11,6 +11,7 @@ export const store = reactive({
   remove(id) {
     const current = this.map.get(id)
     current.remove()
+    this.close()
   },
   open(id) {
     this.focus(false)
@@ -30,23 +31,16 @@ export const store = reactive({
     return this.item
   },
   add(id, window) {
-    const add = (tree, node) => {
-      if (tree) {
-        tree.last.addAfter(node)
-        return tree
-      }
-      return node
-    }
-    const current = this.map.get(id)
-    const node = Node.create('div', window, this.tree === null || current?.children === null)
+    const node = Node.create({ tag: 'div', window })
     this.map.set(node.id, node)
 
-    if (id) {
-      current.children = add(current.children, node)
+    // Current parent Node
+    const current = this.map.get(id)
+    if (current) {
+      current.children.parent = parent
+      current.children.push(node)
     } else {
-      this.tree = add(this.tree, node)
+      this.tree.push(node)
     }
-    console.log(id)
-    console.log(this.tree)
   }
 })
