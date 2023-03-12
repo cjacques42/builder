@@ -1,22 +1,20 @@
 import { reactive } from 'vue'
-import { v4 as uuidv4 } from 'uuid';
-import convert from '@/utils/convert.js'
-
-function add(id, tree, item) {
-    if (id === null) return tree.push(item)
-    tree.forEach(element => {
-        if (element.id === id) element.children.push(item)
-        add(id, element.children, item)
-    })
-}
+import { Node } from '@/lib/tree.js'
 
 export const store = reactive({
-  tree: [],
-  index: {},
+  tree: null,
+  map: new Map(),
   item: null,
+  duplicate(id, recursive = false) {
+    console.log(id, recursive)
+  },
+  remove(id) {
+    const current = this.map.get(id)
+    current.remove()
+  },
   open(id) {
     this.focus(false)
-    this.item = this.index[id] || null
+    this.item = this.map.get(id) || null
     if (this.item === null) throw new Error(`item can't be null`)
     this.focus()
     return this.item
@@ -31,17 +29,24 @@ export const store = reactive({
   get() {
     return this.item
   },
-  add(id, item = null) {
-    if (item === null) throw new Error(`item can't be null`)
-    const node = {
-      id: uuidv4(),
-      tag: 'div',
-      children: [],
-      focus: false,
-      style: convert(item?.window || {}),
-      ...item,
+  add(id, window) {
+    const add = (tree, node) => {
+      if (tree) {
+        tree.last.addAfter(node)
+        return tree
+      }
+      return node
     }
-    this.index[node.id] = node
-    add(id, this.tree, node)
+    const current = this.map.get(id)
+    const node = Node.create('div', window, this.tree === null || current?.children === null)
+    this.map.set(node.id, node)
+
+    if (id) {
+      current.children = add(current.children, node)
+    } else {
+      this.tree = add(this.tree, node)
+    }
+    console.log(id)
+    console.log(this.tree)
   }
 })

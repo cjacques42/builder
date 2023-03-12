@@ -2,7 +2,7 @@
   <vue-resizable
     v-show="store.item"
     ref="window"
-    class="shadow rounded bg-white flex flex-col"
+    class="!absolute shadow rounded bg-white flex flex-col"
     :width="400"
     height="auto"
     :min-width="400"

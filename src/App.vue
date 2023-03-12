@@ -2,7 +2,7 @@
   <div>
     <Builder />
     <Window />
-</div>
+  </div>
 </template>
 
 <script>

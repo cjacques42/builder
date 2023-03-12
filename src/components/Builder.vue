@@ -69,7 +69,7 @@ export default {
         { property: 'width', value: width, active: true },
         { property: 'height', value: height, active: true },
       ]
-      store.add(id, { window })
+      store.add(id, window)
       this.finished()
     },
     finished() {
